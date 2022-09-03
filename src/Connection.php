@@ -38,16 +38,22 @@ final class Connection extends AbstractConnectionMiddleware
 
     public function query(string $sql): Result
     {
-        // $this->logger->debug('Executing query: {sql}', ['sql' => $sql]);
-
-        return parent::query($sql);
+        $this->logger->startQuery($sql);
+        try {
+            return parent::query($sql);
+        } finally {
+            $this->logger->stopQuery();
+        }
     }
 
     public function exec(string $sql): int
     {
-        // $this->logger->debug('Executing statement: {sql}', ['sql' => $sql]);
-
-        return parent::exec($sql);
+        $this->logger->startQuery($sql);
+        try {
+            return parent::exec($sql);
+        } finally {
+            $this->logger->stopQuery();
+        }
     }
 
     /**
