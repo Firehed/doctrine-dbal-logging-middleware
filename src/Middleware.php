@@ -10,10 +10,13 @@ use Psr\Log\LoggerInterface;
 
 final class Middleware implements MiddlewareInterface
 {
-    private QueryLogger $logger;
+    private DbalLogger $logger;
 
     public function __construct(QueryLogger $logger)
     {
+        if (!$logger instanceof DbalLogger) {
+            $logger = new SqlLoggerBridge($logger);
+        }
         $this->logger = $logger;
     }
 

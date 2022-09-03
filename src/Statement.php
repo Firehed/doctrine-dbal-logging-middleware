@@ -17,7 +17,7 @@ use function func_num_args;
 
 final class Statement extends AbstractStatementMiddleware
 {
-    private QueryLogger $logger;
+    private DbalLogger $logger;
     private string $sql;
 
     /** @var array<int,mixed>|array<string,mixed> */
@@ -27,7 +27,7 @@ final class Statement extends AbstractStatementMiddleware
     private array $types = [];
 
     /** @internal This statement can be only instantiated by its connection. */
-    public function __construct(StatementInterface $statement, QueryLogger $logger, string $sql)
+    public function __construct(StatementInterface $statement, DbalLogger $logger, string $sql)
     {
         parent::__construct($statement);
 
