@@ -10,9 +10,9 @@ use Psr\Log\LoggerInterface;
 
 final class Middleware implements MiddlewareInterface
 {
-    private SQLLogger $logger;
+    private QueryLogger $logger;
 
-    public function __construct(SQLLogger $logger)
+    public function __construct(QueryLogger $logger)
     {
         $this->logger = $logger;
     }

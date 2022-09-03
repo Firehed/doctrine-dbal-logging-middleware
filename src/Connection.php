@@ -12,10 +12,10 @@ use Psr\Log\LoggerInterface;
 
 final class Connection extends AbstractConnectionMiddleware
 {
-    private SQLLogger $logger;
+    private QueryLogger $logger;
 
     /** @internal This connection can be only instantiated by its driver. */
-    public function __construct(ConnectionInterface $connection, SQLLogger $logger)
+    public function __construct(ConnectionInterface $connection, QueryLogger $logger)
     {
         parent::__construct($connection);
 
