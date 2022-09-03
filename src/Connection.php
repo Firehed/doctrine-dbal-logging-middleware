@@ -55,10 +55,12 @@ final class Connection extends AbstractConnectionMiddleware
      */
     public function beginTransaction()
     {
-        // "START TRANSACTION"
-        // $this->logger->debug('Beginning transaction');
-
-        return parent::beginTransaction();
+        $this->logger->startQuery('START TRANSACTION');
+        try {
+            return parent::beginTransaction();
+        } finally {
+            $this->logger->stopQuery();
+        }
     }
 
     /**
@@ -66,10 +68,12 @@ final class Connection extends AbstractConnectionMiddleware
      */
     public function commit()
     {
-        // "COMMIT"
-        // $this->logger->debug('Committing transaction');
-
-        return parent::commit();
+        $this->logger->startQuery('COMMIT');
+        try {
+            return parent::commit();
+        } finally {
+            $this->logger->stopQuery();
+        }
     }
 
     /**
@@ -77,9 +81,11 @@ final class Connection extends AbstractConnectionMiddleware
      */
     public function rollBack()
     {
-        // "ROLLBACK"
-        // $this->logger->debug('Rolling back transaction');
-
-        return parent::rollBack();
+        $this->logger->startQuery('ROLLBACK');
+        try {
+            return parent::rollBack();
+        } finally {
+            $this->logger->stopQuery();
+        }
     }
 }
