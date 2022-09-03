@@ -1,0 +1,82 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    # Run on all PRs
+
+env:
+  CI: "true"
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dependencies:
+          - 'high'
+          - 'low'
+        php:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+          - '8.2'
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: pcov
+          ini-values: zend.assertions=1, assert.exception=1, error_reporting=-1
+          php-version: ${{ matrix.php }}
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
+            ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ matrix.php }}-
+            ${{ runner.os }}-composer-${{ matrix.dependencies }}-
+            ${{ runner.os }}-composer-
+
+      - name: Install highest dependencies
+        if: ${{ matrix.dependencies == 'high' }}
+        run: composer update
+          --no-ansi
+          --no-interaction
+          --no-progress
+          --no-suggest
+          --prefer-dist
+
+      - name: Install lowest dependencies
+        if: ${{ matrix.dependencies == 'low' }}
+        run: composer update
+          --no-ansi
+          --no-interaction
+          --no-progress
+          --no-suggest
+          --prefer-dist
+          --prefer-lowest
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit
+          --coverage-clover coverage.xml
+          --coverage-text
+          --printer mheap\\GithubActionsReporter\\Printer
+
+      - name: Submit code coverage
+        if: ${{ always() }}
+        uses: codecov/codecov-action@v2
