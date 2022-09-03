@@ -32,22 +32,4 @@ final class Driver extends AbstractDriverMiddleware
             $this->logger,
         );
     }
-
-    /**
-     * @param array<string,mixed> $params Connection parameters
-     *
-     * @return array<string,mixed>
-     */
-    private function maskPassword(array $params): array
-    {
-        if (isset($params['password'])) {
-            $params['password'] = '<redacted>';
-        }
-
-        if (isset($params['url'])) {
-            $params['url'] = '<redacted>';
-        }
-
-        return $params;
-    }
 }
