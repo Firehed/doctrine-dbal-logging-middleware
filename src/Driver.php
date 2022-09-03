@@ -25,7 +25,7 @@ final class Driver extends AbstractDriverMiddleware
      */
     public function connect(array $params)
     {
-        // $this->logger->info('Connecting with parameters {params}', ['params' => $this->maskPassword($params)]);
+        $this->logger->connect();
 
         return new Connection(
             parent::connect($params),
