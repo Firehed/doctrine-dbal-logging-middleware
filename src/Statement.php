@@ -89,11 +89,11 @@ final class Statement extends AbstractStatementMiddleware
      */
     public function execute($params = null): ResultInterface
     {
-        $this->logger->debug('Executing statement: {sql} (parameters: {params}, types: {types})', [
-            'sql'    => $this->sql,
-            'params' => $params ?? $this->params,
-            'types'  => $this->types,
-        ]);
+        // $this->logger->debug('Executing statement: {sql} (parameters: {params}, types: {types})', [
+        //     'sql'    => $this->sql,
+        //     'params' => $params ?? $this->params,
+        //     'types'  => $this->types,
+        // ]);
 
         return parent::execute($params);
     }
