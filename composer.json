@@ -1,6 +1,6 @@
 {
-    "name": "your/library",
-    "description": "Description of your library",
+    "name": "firehed/dbal-logger",
+    "description": "Reimplementation of the SQLLogger",
     "keywords": [],
     "type": "library",
     "license": "MIT",
@@ -16,16 +16,17 @@
     },
     "autoload": {
         "psr-4": {
-            "Your\\Library\\": "src"
+            "Firehed\\DbalLogger\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Your\\Library\\": "tests"
+            "Firehed\\DbalLogger\\": "tests"
         }
     },
     "require": {
-        "php": "^7.4 || ^8.0"
+        "php": "^7.4 || ^8.0",
+        "doctrine/dbal": "^3.2"
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^2.0 || ^3.0 || ^4.0",
