@@ -26,7 +26,7 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
-        "doctrine/dbal": "^3.2"
+        "doctrine/dbal": "^3.3"
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^2.0 || ^3.0 || ^4.0",
