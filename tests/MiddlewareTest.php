@@ -10,7 +10,13 @@ use Doctrine\DBAL\DriverManager;
 use PDO;
 
 /**
+ * @group integration
+ *
+ * @covers Firehed\DbalLogger\Connection
+ * @covers Firehed\DbalLogger\Driver
  * @covers Firehed\DbalLogger\Middleware
+ * @covers Firehed\DbalLogger\SqlLoggerBridge
+ * @covers Firehed\DbalLogger\Statement
  */
 class MiddlewareTest extends \PHPUnit\Framework\TestCase
 {
