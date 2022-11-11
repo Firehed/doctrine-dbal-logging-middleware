@@ -14,31 +14,50 @@ use PDO;
  */
 class MiddlewareTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstruct(): void
+    public function testConstructWithQueryLogger(): void
     {
         $logger = self::createMock(QueryLogger::class);
+
+        $conn = $this->createDbal($logger);
+
         $logger->expects(self::once())
             ->method('startQuery')
-            ->willReturnCallback(var_dump(...));
-        $middleware = new Middleware($logger);
+            ->with('SELECT 1', null, null);
+        $logger->expects(self::once())
+            ->method('stopQuery');
 
-        $c = $this->createDbal($middleware);
-        // var_dump($c);
-        // $c->query('SELECT 1');
-
-        $s = $c->prepare('SELECT * FROM users WHERE id = :id');
-        $s->bindValue('id', 'abcdef');
-
-        $r = $s->executeQuery();
+        $conn->query('SELECT 1');
     }
 
-    public function createDbal(Middleware $middleware): Connection
+    public function testConstructWithDbalLogger(): void
+    {
+        $logger = self::createMock(DbalLogger::class);
+        $logger->expects(self::once())
+            ->method('connect');
+
+        $conn = $this->createDbal($logger);
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('SELECT 1', null, null);
+        $logger->expects(self::once())
+            ->method('stopQuery');
+
+        $conn->query('SELECT 1');
+
+        $logger->expects(self::once())
+            ->method('disconnect');
+
+        $conn->close();
+    }
+
+    public function createDbal(QueryLogger $logger): Connection
     {
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
         ];
         $config = new Configuration();
-        $config->setMiddlewares([$middleware]);
+        $config->setMiddlewares([new Middleware($logger)]);
         $conn = DriverManager::getConnection($connectionParams, $config);
 
         $pdo = $conn->getWrappedConnection()->getNativeConnection();
