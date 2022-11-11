@@ -8,6 +8,9 @@ use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @internal
+ */
 final class Driver extends AbstractDriverMiddleware
 {
     private DbalLogger $logger;
