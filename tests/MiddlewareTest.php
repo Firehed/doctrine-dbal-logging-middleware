@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Firehed\DbalLogger;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use PDO;
 
 /**
@@ -35,9 +37,9 @@ class MiddlewareTest extends \PHPUnit\Framework\TestCase
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
         ];
-        $config = new \Doctrine\DBAL\Configuration();
+        $config = new Configuration();
         $config->setMiddlewares([$middleware]);
-        $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+        $conn = DriverManager::getConnection($connectionParams, $config);
 
         $pdo = $conn->getWrappedConnection()->getNativeConnection();
         assert($pdo instanceof PDO);
