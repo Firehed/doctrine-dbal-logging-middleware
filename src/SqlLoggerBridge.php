@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Firehed\DbalLogger;
 
+/**
+ * @internal
+ */
 class SqlLoggerBridge implements DbalLogger
 {
     private QueryLogger $logger;
@@ -25,9 +28,11 @@ class SqlLoggerBridge implements DbalLogger
 
     public function connect(): void
     {
+        // no-op
     }
 
     public function disconnect(): void
     {
+        // no-op
     }
 }

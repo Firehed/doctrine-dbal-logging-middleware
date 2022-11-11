@@ -4,6 +4,9 @@ namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\Types\Type;
 
+/**
+ * @api
+ */
 interface QueryLogger
 {
     /**

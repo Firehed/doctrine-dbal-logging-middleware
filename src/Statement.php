@@ -15,6 +15,9 @@ use function array_slice;
 use function func_get_args;
 use function func_num_args;
 
+/**
+ * @internal
+ */
 final class Statement extends AbstractStatementMiddleware
 {
     private DbalLogger $logger;
