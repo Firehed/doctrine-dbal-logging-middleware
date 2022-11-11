@@ -18,7 +18,7 @@ use PDO;
  * @covers Firehed\DbalLogger\SqlLoggerBridge
  * @covers Firehed\DbalLogger\Statement
  */
-class MiddlewareTest extends \PHPUnit\Framework\TestCase
+class IntegrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithQueryLogger(): void
     {
