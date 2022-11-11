@@ -64,7 +64,7 @@ final class Statement extends AbstractStatementMiddleware
         $this->params[$param] = &$variable;
         $this->types[$param]  = $type;
 
-        return parent::bindParam($param, $variable, $type, ...array_slice(func_get_args(), 3));
+        return parent::bindParam($param, $variable, $type, $length);
     }
 
     /**
