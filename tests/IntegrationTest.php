@@ -120,8 +120,9 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loggers
+     * @param MockObject&QueryLogger $logger
      */
-    public function testExecAndQuery(MockObject&QueryLogger $logger): void
+    public function testExecAndQuery(QueryLogger $logger): void
     {
         $conn = $this->createDbal($logger);
         $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('a')");
@@ -135,8 +136,9 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
      /**
      * @dataProvider loggers
+     * @param MockObject&QueryLogger $logger
      */
-    public function testCommit(MockObject&QueryLogger $logger): void
+    public function testCommit(QueryLogger $logger): void
     {
         $logger->expects(self::exactly(3))
             ->method('startQuery')
@@ -155,8 +157,9 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loggers
+     * @param MockObject&QueryLogger $logger
      */
-    public function testRollback(MockObject&QueryLogger $logger): void
+    public function testRollback(QueryLogger $logger): void
     {
         $logger->expects(self::exactly(3))
             ->method('startQuery')
@@ -170,7 +173,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'abc');
         self::assertSame(1, $stmt->executeStatement());
-        self::assertTrue($conn->rollback());
+        self::assertTrue($conn->rollBack());
     }
 
     /**
@@ -199,5 +202,4 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
         return $conn;
     }
-
 }
