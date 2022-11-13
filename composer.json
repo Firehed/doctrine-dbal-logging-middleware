@@ -1,13 +1,19 @@
 {
     "name": "firehed/dbal-logger",
     "description": "Reimplementation of the SQLLogger",
-    "keywords": [],
+    "keywords": [
+        "doctrine",
+        "dbal",
+        "logging",
+        "logger",
+        "sqllogger"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Your Name",
-            "email": "you@example.com"
+            "name": "Eric Stern",
+            "email": "eric@ericstern.com"
         }
     ],
     "config": {
