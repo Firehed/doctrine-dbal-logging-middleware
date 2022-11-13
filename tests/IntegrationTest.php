@@ -33,6 +33,8 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
             ->method('stopQuery');
 
         $conn->query('SELECT 1');
+
+        $conn->close();
     }
 
     public function testConstructWithDbalLogger(): void
