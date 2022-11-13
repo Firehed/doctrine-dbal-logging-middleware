@@ -60,22 +60,6 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $conn->close();
     }
 
-    public function createDbal(QueryLogger $logger): Connection
-    {
-        $connectionParams = [
-            'url' => 'sqlite:///:memory:',
-        ];
-        $config = new Configuration();
-        $config->setMiddlewares([new Middleware($logger)]);
-        $conn = DriverManager::getConnection($connectionParams, $config);
-
-        $pdo = $conn->getWrappedConnection()->getNativeConnection();
-        assert($pdo instanceof PDO);
-        $pdo->exec('CREATE TABLE users (id string PRIMARY KEY);');
-
-        return $conn;
-    }
-
     /**
      * @dataProvider loggers
      */
@@ -141,4 +125,21 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
             'DbalLogger' => [self::createMock(DbalLogger::class)],
         ];
     }
+
+    private function createDbal(QueryLogger $logger): Connection
+    {
+        $connectionParams = [
+            'url' => 'sqlite:///:memory:',
+        ];
+        $config = new Configuration();
+        $config->setMiddlewares([new Middleware($logger)]);
+        $conn = DriverManager::getConnection($connectionParams, $config);
+
+        $pdo = $conn->getWrappedConnection()->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->exec('CREATE TABLE users (id string PRIMARY KEY);');
+
+        return $conn;
+    }
+
 }
