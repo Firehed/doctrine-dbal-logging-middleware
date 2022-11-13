@@ -10,6 +10,9 @@ use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @internal
+ */
 final class Connection extends AbstractConnectionMiddleware
 {
     private DbalLogger $logger;

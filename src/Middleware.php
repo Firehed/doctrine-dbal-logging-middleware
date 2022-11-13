@@ -8,6 +8,9 @@ use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @api
+ */
 final class Middleware implements MiddlewareInterface
 {
     private DbalLogger $logger;
