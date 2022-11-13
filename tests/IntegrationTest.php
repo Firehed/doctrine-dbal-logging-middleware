@@ -79,6 +79,21 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggers
      */
+    public function testExecAndQuery(MockObject&QueryLogger $logger): void
+    {
+        $conn = $this->createDbal($logger);
+        $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('a')");
+        $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('b')");
+        $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('c')");
+        self::assertSame(1, $rowCount);
+
+        $rows = $conn->query('SELECT * FROM users')->fetchAllAssociative();
+        self::assertCount(3, $rows);
+    }
+
+     /**
+     * @dataProvider loggers
+     */
     public function testCommit(MockObject&QueryLogger $logger): void
     {
         $logger->expects(self::exactly(3))
