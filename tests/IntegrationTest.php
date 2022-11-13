@@ -100,6 +100,26 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loggers
+     * @param MockObject&QueryLogger $logger
+     */
+    public function testBindParamByName(QueryLogger $logger): void
+    {
+        $conn = $this->createDbal($logger);
+        $conn->exec("INSERT INTO users (id) VALUES ('a')");
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => 2]);
+
+        $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
+        $id = 'a';
+        $stmt->bindParam('id', $id);
+        $results = $stmt->executeQuery();
+        self::assertCount(1, $results->fetchAllAssociative());
+    }
+
+    /**
+     * @dataProvider loggers
      */
     public function testExecAndQuery(MockObject&QueryLogger $logger): void
     {
