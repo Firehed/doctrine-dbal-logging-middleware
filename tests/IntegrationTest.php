@@ -62,6 +62,44 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loggers
+     * @param MockObject&QueryLogger $logger
+     */
+    public function testBindValueByPosition(QueryLogger $logger): void
+    {
+        $conn = $this->createDbal($logger);
+        $conn->exec("INSERT INTO users (id) VALUES ('a')");
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('SELECT * FROM users WHERE id = ?', [1 => 'a'], [1 => 2]);
+
+        $stmt = $conn->prepare('SELECT * FROM users WHERE id = ?');
+        $stmt->bindValue(1, 'a');
+        $results = $stmt->executeQuery();
+        self::assertCount(1, $results->fetchAllAssociative());
+    }
+
+    /**
+     * @dataProvider loggers
+     * @param MockObject&QueryLogger $logger
+     */
+    public function testBindValueByName(QueryLogger $logger): void
+    {
+        $conn = $this->createDbal($logger);
+        $conn->exec("INSERT INTO users (id) VALUES ('a')");
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => 2]);
+
+        $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
+        $stmt->bindValue('id', 'a');
+        $results = $stmt->executeQuery();
+        self::assertCount(1, $results->fetchAllAssociative());
+    }
+
+    /**
+     * @dataProvider loggers
      */
     public function testExecAndQuery(MockObject&QueryLogger $logger): void
     {
