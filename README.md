@@ -1,6 +1,11 @@
 # DBAL Logger
 A replacement for the the former Doctrine DBAL SQLLogger
 
+[![Test](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/test.yml/badge.svg)](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/test.yml)
+[![Lint](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/lint.yml/badge.svg)](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/lint.yml)
+[![Static analysis](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/static-analysis.yml)
+[![codecov](https://codecov.io/gh/Firehed/doctrine-dbal-logging-middleware/branch/main/graph/badge.svg?token=rcevTlCKj3)](https://codecov.io/gh/Firehed/doctrine-dbal-logging-middleware)
+
 ## Why?
 Doctrine\DBAL\Logging\SQLLogger was deprecated.
 The bundled Middleware-based replacement is _similar_, but with a few critical differences:
