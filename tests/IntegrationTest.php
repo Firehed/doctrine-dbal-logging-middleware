@@ -191,12 +191,13 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     {
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
+            'driver' => 'pdo_sqlite',
         ];
         $config = new Configuration();
         $config->setMiddlewares([new Middleware($logger)]);
         $conn = DriverManager::getConnection($connectionParams, $config);
 
-        $pdo = $conn->getWrappedConnection()->getNativeConnection();
+        $pdo = $conn->getNativeConnection();
         assert($pdo instanceof PDO);
         $pdo->exec('CREATE TABLE users (id string PRIMARY KEY);');
 
