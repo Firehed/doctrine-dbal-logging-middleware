@@ -7,6 +7,7 @@ namespace Firehed\DbalLogger;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\ParameterType;
 use PDO;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -144,7 +145,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
             ->method('startQuery')
             ->withConsecutive(
                 ['START TRANSACTION', null, null],
-                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => 2]],
+                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
                 ['COMMIT', null, null],
             );
         $conn = $this->createDbal($logger);
@@ -165,7 +166,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
             ->method('startQuery')
             ->withConsecutive(
                 ['START TRANSACTION', null, null],
-                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => 2]],
+                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
                 ['ROLLBACK', null, null],
             );
         $conn = $this->createDbal($logger);
