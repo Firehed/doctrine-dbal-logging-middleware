@@ -32,7 +32,7 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
-        "doctrine/dbal": "^3.3 || ^4.0",
+        "doctrine/dbal": "^4.0",
         "doctrine/deprecations": "^1.0"
     },
     "require-dev": {
