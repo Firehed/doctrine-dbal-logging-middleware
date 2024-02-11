@@ -148,11 +148,11 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
                 ['COMMIT', null, null],
             );
         $conn = $this->createDbal($logger);
-        self::assertTrue($conn->beginTransaction());
+        $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'abc');
         self::assertSame(1, $stmt->executeStatement());
-        self::assertTrue($conn->commit());
+        $conn->commit();
     }
 
     /**
@@ -169,11 +169,11 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
                 ['ROLLBACK', null, null],
             );
         $conn = $this->createDbal($logger);
-        self::assertTrue($conn->beginTransaction());
+        $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'abc');
         self::assertSame(1, $stmt->executeStatement());
-        self::assertTrue($conn->rollBack());
+        $conn->rollBack();
     }
 
     /**
