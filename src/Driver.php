@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\Driver as DriverInterface;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Psr\Log\LoggerInterface;
 
@@ -26,7 +27,7 @@ final class Driver extends AbstractDriverMiddleware
     /**
      * {@inheritDoc}
      */
-    public function connect(array $params)
+    public function connect(array $params): DriverConnection
     {
         $this->logger->connect();
 
