@@ -103,26 +103,6 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
      * @dataProvider loggers
      * @param MockObject&QueryLogger $logger
      */
-    public function testBindParamByName(QueryLogger $logger): void
-    {
-        $conn = $this->createDbal($logger);
-        $this->insertRow($conn, 'a');
-
-        $logger->expects(self::once())
-            ->method('startQuery')
-            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => ParameterType::STRING]);
-
-        $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
-        $id = 'a';
-        $stmt->bindParam('id', $id);
-        $results = $stmt->executeQuery();
-        self::assertCount(1, $results->fetchAllAssociative());
-    }
-
-    /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
-     */
     public function testExecAndQuery(QueryLogger $logger): void
     {
         $conn = $this->createDbal($logger);
@@ -149,11 +129,11 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
                 ['COMMIT', null, null],
             );
         $conn = $this->createDbal($logger);
-        self::assertTrue($conn->beginTransaction());
+        $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'abc');
         self::assertSame(1, $stmt->executeStatement());
-        self::assertTrue($conn->commit());
+        $conn->commit();
     }
 
     /**
@@ -170,11 +150,11 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
                 ['ROLLBACK', null, null],
             );
         $conn = $this->createDbal($logger);
-        self::assertTrue($conn->beginTransaction());
+        $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'abc');
         self::assertSame(1, $stmt->executeStatement());
-        self::assertTrue($conn->rollBack());
+        $conn->rollBack();
     }
 
     /**
@@ -192,6 +172,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     {
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
+            'driver' => 'pdo_sqlite',
         ];
         $config = new Configuration();
         $config->setMiddlewares([new Middleware($logger)]);

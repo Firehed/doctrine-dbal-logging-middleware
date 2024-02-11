@@ -23,10 +23,10 @@ final class Statement extends AbstractStatementMiddleware
     private DbalLogger $logger;
     private string $sql;
 
-    /** @var array<int,mixed>|array<string,mixed> */
+    /** @var mixed[] */
     private array $params = [];
 
-    /** @var array<int,int>|array<string,int> */
+    /** @var ParameterType[] */
     private array $types = [];
 
     /** @internal This statement can be only instantiated by its connection. */
@@ -38,63 +38,19 @@ final class Statement extends AbstractStatementMiddleware
         $this->sql    = $sql;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Use {@see bindValue()} instead.
-     */
-    public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
+    public function bindValue(int|string $param, mixed $value, ParameterType $type): void
     {
-        Deprecation::trigger(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/5563',
-            '%s is deprecated. Use bindValue() instead.',
-            __METHOD__,
-        );
-
-        if (func_num_args() < 3) {
-            Deprecation::trigger(
-                'doctrine/dbal',
-                'https://github.com/doctrine/dbal/pull/5558',
-                'Not passing $type to Statement::bindParam() is deprecated.'
-                    . ' Pass the type corresponding to the parameter being bound.',
-            );
-        }
-
-        $this->params[$param] = &$variable;
-        $this->types[$param]  = $type;
-
-        return parent::bindParam($param, $variable, $type, $length);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function bindValue($param, $value, $type = ParameterType::STRING): bool
-    {
-        if (func_num_args() < 3) {
-            Deprecation::trigger(
-                'doctrine/dbal',
-                'https://github.com/doctrine/dbal/pull/5558',
-                'Not passing $type to Statement::bindValue() is deprecated.'
-                    . ' Pass the type corresponding to the parameter being bound.',
-            );
-        }
-
         $this->params[$param] = $value;
         $this->types[$param]  = $type;
 
-        return parent::bindValue($param, $value, $type);
+        parent::bindValue($param, $value, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function execute($params = null): ResultInterface
+    public function execute(): ResultInterface
     {
-        $this->logger->startQuery($this->sql, $params ?? $this->params, $this->types);
+        $this->logger->startQuery($this->sql, $this->params, $this->types);
         try {
-            return parent::execute($params);
+            return parent::execute();
         } finally {
             $this->logger->stopQuery();
         }
