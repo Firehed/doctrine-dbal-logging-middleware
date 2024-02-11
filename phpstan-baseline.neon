@@ -1,0 +1,14 @@
+parameters:
+	ignoreErrors:
+		-
+			message: """
+				#^Call to deprecated method bindParam\\(\\) of class Doctrine\\\\DBAL\\\\Statement\\:
+				Use \\{@see bindValue\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: tests/IntegrationTest.php
+
+		-
+			message: "#^Call to deprecated method withConsecutive\\(\\) of class PHPUnit\\\\Framework\\\\MockObject\\\\Builder\\\\InvocationMocker\\.$#"
+			count: 2
+			path: tests/IntegrationTest.php
