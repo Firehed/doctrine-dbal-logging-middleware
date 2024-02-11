@@ -43,7 +43,7 @@ final class Statement extends AbstractStatementMiddleware
      *
      * @deprecated Use {@see bindValue()} instead.
      */
-    public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null)
+    public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
     {
         Deprecation::trigger(
             'doctrine/dbal',
@@ -70,7 +70,7 @@ final class Statement extends AbstractStatementMiddleware
     /**
      * {@inheritdoc}
      */
-    public function bindValue($param, $value, $type = ParameterType::STRING)
+    public function bindValue($param, $value, $type = ParameterType::STRING): bool
     {
         if (func_num_args() < 3) {
             Deprecation::trigger(
