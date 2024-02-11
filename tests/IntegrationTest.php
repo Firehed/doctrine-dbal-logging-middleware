@@ -72,7 +72,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
         $logger->expects(self::once())
             ->method('startQuery')
-            ->with('SELECT * FROM users WHERE id = ?', [1 => 'a'], [1 => 2]);
+            ->with('SELECT * FROM users WHERE id = ?', [1 => 'a'], [1 => ParameterType::STRING]);
 
         $stmt = $conn->prepare('SELECT * FROM users WHERE id = ?');
         $stmt->bindValue(1, 'a');
@@ -91,7 +91,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
         $logger->expects(self::once())
             ->method('startQuery')
-            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => 2]);
+            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => ParameterType::STRING]);
 
         $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
         $stmt->bindValue('id', 'a');
@@ -110,7 +110,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
         $logger->expects(self::once())
             ->method('startQuery')
-            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => 2]);
+            ->with('SELECT * FROM users WHERE id = :id', ['id' => 'a'], ['id' => ParameterType::STRING]);
 
         $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
         $id = 'a';
