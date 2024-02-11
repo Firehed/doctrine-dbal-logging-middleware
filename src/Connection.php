@@ -49,7 +49,7 @@ final class Connection extends AbstractConnectionMiddleware
         }
     }
 
-    public function exec(string $sql): int
+    public function exec(string $sql): int|string
     {
         $this->logger->startQuery($sql);
         try {
@@ -59,40 +59,31 @@ final class Connection extends AbstractConnectionMiddleware
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
         $this->logger->startQuery('START TRANSACTION');
         try {
-            return parent::beginTransaction();
+            parent::beginTransaction();
         } finally {
             $this->logger->stopQuery();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function commit()
+    public function commit(): void
     {
         $this->logger->startQuery('COMMIT');
         try {
-            return parent::commit();
+            parent::commit();
         } finally {
             $this->logger->stopQuery();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function rollBack()
+    public function rollBack(): void
     {
         $this->logger->startQuery('ROLLBACK');
         try {
-            return parent::rollBack();
+            parent::rollBack();
         } finally {
             $this->logger->stopQuery();
         }
