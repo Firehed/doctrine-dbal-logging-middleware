@@ -126,12 +126,12 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     public function testExecAndQuery(QueryLogger $logger): void
     {
         $conn = $this->createDbal($logger);
-        $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('a')");
-        $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('b')");
-        $rowCount = $conn->exec("INSERT INTO users (id) VALUES ('c')");
+        $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('a')");
+        $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('b')");
+        $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('c')");
         self::assertSame(1, $rowCount);
 
-        $rows = $conn->query('SELECT * FROM users')->fetchAllAssociative();
+        $rows = $conn->executeQuery('SELECT * FROM users')->fetchAllAssociative();
         self::assertCount(3, $rows);
     }
 
