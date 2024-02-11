@@ -23,10 +23,10 @@ final class Statement extends AbstractStatementMiddleware
     private DbalLogger $logger;
     private string $sql;
 
-    /** @var array<int,mixed>|array<string,mixed> */
+    /** @var mixed[] */
     private array $params = [];
 
-    /** @var array<ParameterType> */
+    /** @var ParameterType[] */
     private array $types = [];
 
     /** @internal This statement can be only instantiated by its connection. */
