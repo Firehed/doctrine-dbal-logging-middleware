@@ -9,4 +9,4 @@ There is one probably-small adjustment to account for:
 If your logger does not look at `$types`, you almost certainly don't have to do anything.
 
 Since the enum-based version in DBAL 4 is name-compatible with the constants in DBAL 3 (e.g. `ParameterType::STRING`), it's possible you don't need to make any changes to your implementation.
-Depending on _what_ you're using the `$types` for, you may need to adjust your output format.
+Depending on _how_ you're using `$types`, you may need to adjust your implementation or output format.
