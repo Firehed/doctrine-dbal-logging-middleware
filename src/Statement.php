@@ -8,7 +8,6 @@ use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\Deprecations\Deprecation;
 use Psr\Log\LoggerInterface;
 
 use function array_slice;
