@@ -34,7 +34,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $logger->expects(self::once())
             ->method('stopQuery');
 
-        $conn->query('SELECT 1');
+        $conn->executeQuery('SELECT 1');
 
         $conn->close();
     }
@@ -53,7 +53,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $logger->expects(self::once())
             ->method('stopQuery');
 
-        $conn->query('SELECT 1');
+        $conn->executeQuery('SELECT 1');
 
         $logger->expects(self::once())
             ->method('disconnect');
@@ -114,7 +114,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
         $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
         $id = 'a';
-        $stmt->bindParam('id', $id);
+        $stmt->bindValue('id', $id);
         $results = $stmt->executeQuery();
         self::assertCount(1, $results->fetchAllAssociative());
     }
@@ -197,7 +197,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $config->setMiddlewares([new Middleware($logger)]);
         $conn = DriverManager::getConnection($connectionParams, $config);
 
-        $pdo = $conn->getWrappedConnection()->getNativeConnection();
+        $pdo = $conn->getNativeConnection();
         assert($pdo instanceof PDO);
         $pdo->exec('CREATE TABLE users (id string PRIMARY KEY);');
 
