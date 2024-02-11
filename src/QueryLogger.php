@@ -19,7 +19,7 @@ interface QueryLogger
      *
      * @return void
      */
-    public function startQuery($sql, array $params = null, array $types = []);
+    public function startQuery($sql, ?array $params = null, ?array $types = null);
 
     /**
      * Marks the last started query as stopped. This can be used for timing of queries.
