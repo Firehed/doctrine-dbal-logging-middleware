@@ -13,8 +13,8 @@ interface QueryLogger
     /**
      * Logs a SQL statement somewhere.
      *
-     * @param string                                                                    $sql    SQL statement
-     * @param list<mixed>|array<string, mixed>|null                                     $params Statement parameters
+     * @param string $sql SQL statement
+     * @param list<mixed>|array<string, mixed>|null $params Statement parameters
      * @param ParameterType[] $types
      *
      * @return void
