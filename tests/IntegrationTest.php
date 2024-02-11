@@ -114,7 +114,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
 
         $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
         $id = 'a';
-        $stmt->bindValue('id', $id);
+        $stmt->bindParam('id', $id);
         $results = $stmt->executeQuery();
         self::assertCount(1, $results->fetchAllAssociative());
     }
