@@ -2,6 +2,7 @@
 
 namespace Firehed\DbalLogger;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -14,11 +15,11 @@ interface QueryLogger
      *
      * @param string                                                                    $sql    SQL statement
      * @param list<mixed>|array<string, mixed>|null                                     $params Statement parameters
-     * @param array<int, Type|int|string|null>|array<string, Type|int|string|null>|null $types  Parameter types
+     * @param ParameterType[] $types
      *
      * @return void
      */
-    public function startQuery($sql, ?array $params = null, ?array $types = null);
+    public function startQuery($sql, array $params = null, array $types = []);
 
     /**
      * Marks the last started query as stopped. This can be used for timing of queries.
