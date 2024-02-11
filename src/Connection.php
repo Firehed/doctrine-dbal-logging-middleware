@@ -59,10 +59,7 @@ final class Connection extends AbstractConnectionMiddleware
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         $this->logger->startQuery('START TRANSACTION');
         try {
@@ -72,10 +69,7 @@ final class Connection extends AbstractConnectionMiddleware
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function commit()
+    public function commit(): bool
     {
         $this->logger->startQuery('COMMIT');
         try {
@@ -85,10 +79,7 @@ final class Connection extends AbstractConnectionMiddleware
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function rollBack()
+    public function rollBack(): bool
     {
         $this->logger->startQuery('ROLLBACK');
         try {
