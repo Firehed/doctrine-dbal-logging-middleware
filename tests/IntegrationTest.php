@@ -68,7 +68,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     public function testBindValueByPosition(QueryLogger $logger): void
     {
         $conn = $this->createDbal($logger);
-        $conn->exec("INSERT INTO users (id) VALUES ('a')");
+        $this->insertRow($conn, 'a');
 
         $logger->expects(self::once())
             ->method('startQuery')
@@ -87,7 +87,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     public function testBindValueByName(QueryLogger $logger): void
     {
         $conn = $this->createDbal($logger);
-        $conn->exec("INSERT INTO users (id) VALUES ('a')");
+        $this->insertRow($conn, 'a');
 
         $logger->expects(self::once())
             ->method('startQuery')
@@ -106,7 +106,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     public function testBindParamByName(QueryLogger $logger): void
     {
         $conn = $this->createDbal($logger);
-        $conn->exec("INSERT INTO users (id) VALUES ('a')");
+        $this->insertRow($conn, 'a');
 
         $logger->expects(self::once())
             ->method('startQuery')
@@ -202,5 +202,10 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $pdo->exec('CREATE TABLE users (id string PRIMARY KEY);');
 
         return $conn;
+    }
+
+    private function insertRow(Connection $conn, string $id): void
+    {
+        $conn->executeStatement("INSERT INTO users (id) VALUES (:id)", ['id' => $id]);
     }
 }
