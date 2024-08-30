@@ -9,3 +9,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+  # Keep Github Actions up to date
+  # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"

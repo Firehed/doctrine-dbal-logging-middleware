@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -38,11 +38,10 @@ jobs:
 
       - name: Get Composer Cache Directory
         id: composer-cache
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
@@ -76,7 +75,16 @@ jobs:
           --coverage-clover coverage.xml
           --coverage-text
           --printer mheap\\GithubActionsReporter\\Printer
+          --log-junit junit.xml
 
       - name: Submit code coverage
         if: ${{ always() }}
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
