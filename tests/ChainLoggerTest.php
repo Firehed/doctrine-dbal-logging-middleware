@@ -15,19 +15,22 @@ class ChainLoggerTest extends TestCase
 {
     private DbalLogger&MockObject $l1;
     private DbalLogger&MockObject $l2;
+    private QueryLogger&MockObject $l3;
     private ChainLogger $logger;
 
     public function setUp(): void
     {
         $this->l1 = self::createMock(DbalLogger::class);
         $this->l2 = self::createMock(DbalLogger::class);
-        $this->logger = new ChainLogger([$this->l1, $this->l2]);
+        $this->l3 = self::createMock(QueryLogger::class);
+        $this->logger = new ChainLogger([$this->l1, $this->l2, $this->l3]);
     }
 
     public function testConnectDelegates(): void
     {
         $this->l1->expects(self::once())->method('connect');
         $this->l2->expects(self::once())->method('connect');
+        // No l3
         $this->logger->connect();
     }
 
@@ -35,6 +38,7 @@ class ChainLoggerTest extends TestCase
     {
         $this->l1->expects(self::once())->method('disconnect');
         $this->l2->expects(self::once())->method('disconnect');
+        // No l3
         $this->logger->disconnect();
     }
 
@@ -45,6 +49,7 @@ class ChainLoggerTest extends TestCase
         $types = [ParameterType::INTEGER, ParameterType::STRING, ParameterType::STRING];
         $this->l1->expects(self::once())->method('startQuery')->with($sql, $params, $types);
         $this->l2->expects(self::once())->method('startQuery')->with($sql, $params, $types);
+        $this->l3->expects(self::once())->method('startQuery')->with($sql, $params, $types);
         $this->logger->startQuery($sql, $params, $types);
     }
 
@@ -52,6 +57,7 @@ class ChainLoggerTest extends TestCase
     {
         $this->l1->expects(self::once())->method('stopQuery');
         $this->l2->expects(self::once())->method('stopQuery');
+        $this->l3->expects(self::once())->method('stopQuery');
         $this->logger->stopQuery();
     }
 }
