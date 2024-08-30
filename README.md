@@ -53,6 +53,18 @@ If you _don't_ have a SQLLogger implementation you're looking to migrate, you'll
 
 That should do it!
 
+## I need to log to multiple backends!
+
+No problem - there's a built in `ChainLogger` that accepts an array of `QueryLogger`/`DbalLogger` instances.
+When configured, it will relay all of the logging events it receives to each of the loggers.
+
+```php
+$logger1 = new MyLogger();
+$logger2 = new MyOtherLogger(); // Maybe metrics?
+$chain = new ChainLogger([$logger1, $logger2]);
+$config->setMiddlewares([new LoggerMiddleware($chain)])
+```
+
 ## Misc
 
 This project follows semantic versioning.
