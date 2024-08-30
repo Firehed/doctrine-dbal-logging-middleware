@@ -75,9 +75,16 @@ jobs:
           --coverage-clover coverage.xml
           --coverage-text
           --printer mheap\\GithubActionsReporter\\Printer
+          --log-junit junit.xml
 
       - name: Submit code coverage
         if: ${{ always() }}
         uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
