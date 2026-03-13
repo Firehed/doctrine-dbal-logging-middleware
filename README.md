@@ -38,7 +38,7 @@ class MyLogger implements DbalLogger
         // Commonly: store $sql and start a timer
     }
 
-    public function stopQuery(?Throwable $exception = null): void
+    public function stopQuery(?Throwable $exception): void
     {
         // Called after each query completes (or fails)
         // Commonly: determine the query duration based on the start timer and log or send a telemetry event
@@ -75,7 +75,7 @@ The `stopQuery()` method receives the exception if a query fails, or `null` on s
 This enables query timing, failure tracking, and telemetry:
 
 ```php
-public function stopQuery(?Throwable $exception = null): void
+public function stopQuery(?Throwable $exception): void
 {
     $duration = hrtime(true) - $this->start;
     if ($exception !== null) {
