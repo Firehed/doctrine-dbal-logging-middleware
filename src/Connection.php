@@ -56,10 +56,14 @@ final class Connection extends AbstractConnectionMiddleware
     public function exec(string $sql): int|string
     {
         $this->logger->startQuery($sql);
+        $exception = null;
         try {
             return parent::exec($sql);
+        } catch (Throwable $e) {
+            $exception = $e;
+            throw $e;
         } finally {
-            $this->logger->stopQuery();
+            $this->logger->stopQuery($exception);
         }
     }
 
