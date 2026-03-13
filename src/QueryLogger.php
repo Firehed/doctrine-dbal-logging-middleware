@@ -4,6 +4,7 @@ namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Type;
+use Throwable;
 
 /**
  * @api
@@ -24,7 +25,9 @@ interface QueryLogger
     /**
      * Marks the last started query as stopped. This can be used for timing of queries.
      *
+     * If the query failed with an exception of any kind, it will be provided.
+     *
      * @return void
      */
-    public function stopQuery();
+    public function stopQuery(?Throwable $exception = null);
 }
