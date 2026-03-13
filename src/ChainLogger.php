@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Firehed\DbalLogger;
 
+use Throwable;
+
 /**
  * Runs all of the specified loggers, FIFO.
  */
@@ -41,10 +43,10 @@ class ChainLogger implements DbalLogger
         }
     }
 
-    public function stopQuery(): void
+    public function stopQuery(?Throwable $exception = null): void
     {
         foreach ($this->loggers as $logger) {
-            $logger->stopQuery();
+            $logger->stopQuery($exception);
         }
     }
 }
