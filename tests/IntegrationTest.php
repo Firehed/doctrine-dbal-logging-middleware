@@ -109,7 +109,7 @@ class IntegrationTest extends TestCase
     #[DataProvider('loggers')]
     public function testExecAndQuery(string $loggerClass): void
     {
-        $logger = $this->createStub($loggerClass);
+        $logger = self::createStub($loggerClass);
         $conn = $this->createDbal($logger);
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('a')");
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('b')");
