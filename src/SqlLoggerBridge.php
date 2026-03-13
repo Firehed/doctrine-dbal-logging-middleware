@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Firehed\DbalLogger;
 
+use Throwable;
+
 /**
  * @internal
  */
@@ -21,9 +23,9 @@ class SqlLoggerBridge implements DbalLogger
         $this->logger->startQuery($sql, $params, $types);
     }
 
-    public function stopQuery(): void
+    public function stopQuery(?Throwable $exception = null): void
     {
-        $this->logger->stopQuery();
+        $this->logger->stopQuery($exception);
     }
 
     public function connect(): void
