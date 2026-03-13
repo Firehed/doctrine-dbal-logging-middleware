@@ -25,7 +25,7 @@ interface DbalLogger
      *
      * If the query failed with an exception of any kind, it will be provided.
      */
-    public function stopQuery(?Throwable $exception = null): void;
+    public function stopQuery(?Throwable $exception): void;
 
     public function connect(): void;
 

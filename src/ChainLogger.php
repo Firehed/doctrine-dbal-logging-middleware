@@ -39,7 +39,7 @@ class ChainLogger implements DbalLogger
         }
     }
 
-    public function stopQuery(?Throwable $exception = null): void
+    public function stopQuery(?Throwable $exception): void
     {
         foreach ($this->loggers as $logger) {
             $logger->stopQuery($exception);

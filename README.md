@@ -1,33 +1,81 @@
 # DBAL Logger
-A replacement for the the former Doctrine DBAL SQLLogger
+
+A customizable query logger for Doctrine DBAL.
+
+This can be used in a number of ways:
+
+- Debug logging
+- Telemetry
+- Capturing SQL queries for audit trails
+- And more! Be creative!
 
 [![Test](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/test.yml/badge.svg)](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/test.yml)
 [![Lint](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/lint.yml/badge.svg)](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/lint.yml)
 [![Static analysis](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/Firehed/doctrine-dbal-logging-middleware/actions/workflows/static-analysis.yml)
 [![codecov](https://codecov.io/gh/Firehed/doctrine-dbal-logging-middleware/branch/main/graph/badge.svg?token=rcevTlCKj3)](https://codecov.io/gh/Firehed/doctrine-dbal-logging-middleware)
 
-## Why?
-Doctrine\DBAL\Logging\SQLLogger was deprecated.
-The bundled Middleware-based replacement is _similar_, but with a few critical differences:
+## Installation
 
-- It's tied directly to a PSR-3 logger
-- The log format (and levels) is part of the middleware; it cannot be customized
-- There is no event for queries completing; this makes it impossible to use the logger for application telemetry.
+```bash
+composer require firehed/dbal-logger
+```
 
-## How this is similar to the original
+## Usage
 
-The basic API remains the same: `startQuery()` and `stopQuery()`.
+1. Implement `Firehed\DbalLogger\DbalLogger`
+2. Wrap it in the middleware
+3. Add the middleware to your DBAL configuration
+
+```php
+use Firehed\DbalLogger\DbalLogger;
+use Firehed\DbalLogger\Middleware;
+
+class MyLogger implements DbalLogger
+{
+    public function startQuery(string $sql, ?array $params = null, ?array $types = null): void
+    {
+        // Called before each query
+        // Commonly: store $sql and start a timer
+    }
+
+    public function stopQuery(?Throwable $exception): void
+    {
+        // Called after each query completes (or fails)
+        // Commonly: determine the query duration based on the start timer and log or send a telemetry event
+    }
+
+    public function connect(): void
+    {
+        // Called when a connection is established
+    }
+
+    public function disconnect(): void
+    {
+        // Called when a connection is closed
+    }
+}
+
+$logger = new MyLogger();
+$middleware = new Middleware($logger);
+
+// Add to your Doctrine\DBAL\Configuration
+$config = new \Doctrine\DBAL\Configuration();
+$config->setMiddlewares([$middleware]);
+
+$connection = \Doctrine\DBAL\DriverManager::getConnection($connectionDetails, $config);
+```
+
+> [!TIP]
+> Use dependency injection to provide services to your DbalLogger implementation,
+> such as a log writer (e.g. PSR-3) or telemetry system.
 
 ## Error Handling
 
-The `stopQuery()` method accepts an optional `?\Throwable $exception` parameter.
-If the query failed with an exception, it will be passed to `stopQuery()`.
-On success, `null` is passed.
-
-This allows your logger to record query failures for debugging or metrics purposes:
+The `stopQuery()` method receives the exception if a query fails, or `null` on success.
+This enables query timing, failure tracking, and telemetry:
 
 ```php
-public function stopQuery(?Throwable $exception = null): void
+public function stopQuery(?Throwable $exception): void
 {
     $duration = hrtime(true) - $this->start;
     if ($exception !== null) {
@@ -45,55 +93,46 @@ public function stopQuery(?Throwable $exception = null): void
 }
 ```
 
-## How this is different from the original
+## Multiple Loggers
 
-`Doctrine\DBAL\Logging\SQLLogger` is now `Firehed\DbalLogger\DbalLogger`.
-
-Setup for DBAL/ORM is different; that's inherent to the deprecation that prompted the creation of this library.
-
-The port of the original SQLLogger did not have native return types, instead favoring docblocks.
-This adds an explicit return type to the interface.
-
-The `DbalLogger` interface also includes `connect()` and `disconnect()` hooks.
-If you don't need these, implement them as no-ops.
-
-The `SAVEPOINT` queries either will show up in their underlying connection-specific syntax or possibly not at all.
-I'm not sure how to test this!
-(doctrine/dbal/src/Connection.php and thereabouts)
-
-You can now find out about query failres (see Error Handling, above)
-
-## How to use this
-If you have an implemenation of the DBAL SQLLogger interface (which is probably the case if you're here), you'll need to make the following changes:
-
-- Have it implement `Firehed\DbalLogger\DbalLogger` instead of `Doctrine\DBAL\Logging\SQLLogger`
-- Add `connect(): void` and `disconnect(): void` methods (can be no-ops)
-- Wrap it in Middleware: `$middleware = new Firehed\DbalLogger\Middleware($yourLogger);`
-- Adjust your DBAL/Doctrine setup code to use the Middleware instead of directly using the Logger:
-```diff
--$config->setSQLLogger($yourSQLLogger);
-+$config->setMiddlewares([$middleware]);
-```
-
-If you _don't_ have a SQLLogger implementation you're looking to migrate, you'll want create one!
-
-1) Implement `Firehed\DbalLogger\DbalLogger`
-2) Wrap it in a middleware: `$middleware = new \Firehed\DbalLogger\Middleware($instanceOfYourClass);`
-3) Add it to the DBAL/Doctrine config, per above.
-
-That should do it!
-
-## I need to log to multiple backends!
-
-No problem - there's a built in `ChainLogger` that accepts an array of `DbalLogger` instances.
-When configured, it will relay all of the logging events it receives to each of the loggers.
+Use `ChainLogger` to send events to multiple loggers:
 
 ```php
-$logger1 = new MyLogger();
-$logger2 = new MyOtherLogger(); // Maybe metrics?
-$chain = new ChainLogger([$logger1, $logger2]);
-$config->setMiddlewares([new LoggerMiddleware($chain)])
+use Firehed\DbalLogger\ChainLogger;
+use Firehed\DbalLogger\Middleware;
+
+$chain = new ChainLogger([
+    new QueryLogger(),
+    new MetricsLogger(),
+    new AuditTrailLogger(),
+]);
+
+$config = new \Doctrine\DBAL\Configuration();
+$config->setMiddlewares([new Middleware($chain)]);
 ```
+
+## Migrating from SQLLogger
+
+If you're migrating from the deprecated `Doctrine\DBAL\Logging\SQLLogger`:
+
+- Change `implements SQLLogger` to `implements DbalLogger`
+- Add `connect(): void` and `disconnect(): void` methods (can be no-ops)
+- The `stopQuery()` method now accepts `?Throwable $exception`
+- Wrap your logger in the middleware and configure DBAL:
+
+```diff
+-$config->setSQLLogger($yourSQLLogger);
++$config->setMiddlewares([new Middleware($yourLogger)]);
+```
+
+## Why this library?
+
+Doctrine's bundled middleware-based replacement for SQLLogger has limitations:
+- It's tied directly to a PSR-3 logger
+- The log format and levels cannot be customized
+- There is no event for queries completing, making telemetry impossible
+
+This library provides full control over logging behavior while using DBAL's middleware system.
 
 ## Misc
 
