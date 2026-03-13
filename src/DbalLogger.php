@@ -10,7 +10,7 @@ use Throwable;
 /**
  * @api
  */
-interface QueryLogger
+interface DbalLogger
 {
     /**
      * Logs a SQL statement somewhere.
