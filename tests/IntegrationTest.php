@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use PDO;
@@ -189,7 +189,7 @@ class IntegrationTest extends TestCase
         ];
     }
 
-    private function createDbal(QueryLogger $logger): Connection
+    private function createDbal(QueryLogger $logger): DBALConnection
     {
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
@@ -206,7 +206,7 @@ class IntegrationTest extends TestCase
         return $conn;
     }
 
-    private function insertRow(Connection $conn, string $id): void
+    private function insertRow(DBALConnection $conn, string $id): void
     {
         $conn->executeStatement("INSERT INTO users (id) VALUES (:id)", ['id' => $id]);
     }
