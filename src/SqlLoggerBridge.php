@@ -18,7 +18,7 @@ class SqlLoggerBridge implements DbalLogger
         $this->logger = $logger;
     }
 
-    public function startQuery($sql, ?array $params = null, ?array $types = null): void
+    public function startQuery(string $sql, ?array $params = null, ?array $types = null): void
     {
         $this->logger->startQuery($sql, $params, $types);
     }

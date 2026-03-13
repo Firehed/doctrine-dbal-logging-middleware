@@ -36,7 +36,7 @@ class ChainLogger implements DbalLogger
         }
     }
 
-    public function startQuery($sql, ?array $params = null, ?array $types = null): void
+    public function startQuery(string $sql, ?array $params = null, ?array $types = null): void
     {
         foreach ($this->loggers as $logger) {
             $logger->startQuery($sql, $params, $types);
