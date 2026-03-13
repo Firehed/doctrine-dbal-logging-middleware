@@ -67,7 +67,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testBindValueByPosition(string $loggerClass): void
@@ -87,7 +87,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testBindValueByName(string $loggerClass): void
@@ -107,7 +107,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testExecAndQuery(string $loggerClass): void
@@ -124,7 +124,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testCommit(string $loggerClass): void
@@ -153,7 +153,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testRollback(string $loggerClass): void
@@ -182,7 +182,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testStopQueryReceivesExceptionOnQueryFailure(string $loggerClass): void
@@ -202,7 +202,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testStopQueryReceivesExceptionOnExecFailure(string $loggerClass): void
@@ -222,7 +222,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testStopQueryReceivesExceptionOnPreparedStatementFailure(string $loggerClass): void
@@ -244,7 +244,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testStopQueryReceivesExceptionOnBeginTransactionFailure(string $loggerClass): void
@@ -269,7 +269,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testStopQueryReceivesExceptionOnCommitFailure(string $loggerClass): void
@@ -296,7 +296,7 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @param class-string<QueryLogger> $loggerClass
+     * @param class-string<DbalLogger> $loggerClass
      */
     #[DataProvider('loggers')]
     public function testStopQueryReceivesExceptionOnRollbackFailure(string $loggerClass): void
@@ -323,17 +323,16 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @return array{class-string<QueryLogger>}[]
+     * @return array{class-string<DbalLogger>}[]
      */
     public static function loggers(): array
     {
         return [
-            'QueryLogger' => [QueryLogger::class],
             'DbalLogger' => [DbalLogger::class],
         ];
     }
 
-    private function createDbal(QueryLogger $logger): DBALConnection
+    private function createDbal(DbalLogger $logger): DBALConnection
     {
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
