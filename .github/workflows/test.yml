@@ -71,11 +71,14 @@ jobs:
           --prefer-dist
           --prefer-lowest
 
+      - name: Enable problem matchers
+        uses: mheap/phpunit-matcher-action@v1
+
       - name: PHPUnit
         run: vendor/bin/phpunit
+          --teamcity
           --coverage-clover coverage.xml
           --coverage-text
-          --printer mheap\\GithubActionsReporter\\Printer
           --log-junit junit.xml
 
       - name: Submit code coverage
