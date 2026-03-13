@@ -57,9 +57,18 @@ class ChainLoggerTest extends TestCase
 
     public function testStopQueryDelegates(): void
     {
-        $this->l1->expects(self::once())->method('stopQuery');
-        $this->l2->expects(self::once())->method('stopQuery');
-        $this->l3->expects(self::once())->method('stopQuery');
+        $this->l1->expects(self::once())->method('stopQuery')->with(null);
+        $this->l2->expects(self::once())->method('stopQuery')->with(null);
+        $this->l3->expects(self::once())->method('stopQuery')->with(null);
         $this->logger->stopQuery();
+    }
+
+    public function testStopQueryDelegatesException(): void
+    {
+        $exception = new \RuntimeException('Query failed');
+        $this->l1->expects(self::once())->method('stopQuery')->with($exception);
+        $this->l2->expects(self::once())->method('stopQuery')->with($exception);
+        $this->l3->expects(self::once())->method('stopQuery')->with($exception);
+        $this->logger->stopQuery($exception);
     }
 }
