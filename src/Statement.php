@@ -22,7 +22,7 @@ final class Statement extends AbstractStatementMiddleware
     private DbalLogger $logger;
     private string $sql;
 
-    /** @var mixed[] */
+    /** @var array<int|string, mixed> */
     private array $params = [];
 
     /** @var ParameterType[] */
