@@ -1,3 +1,8 @@
+# 3.0.0
+
+`QueryLogger` and `DbalLogger` are no longer separate interfaces; there's only `DbalLogger`.
+If you were relying on the more narrowly-scoped `QueryLogger` interface, you'll need to add `connect()` and `disconnect()` methods (which can be empty) and change which interface you're implementing.
+
 # 2.0.0
 
 This adds support for DBAL 4, and drops support for DBAL 3.
