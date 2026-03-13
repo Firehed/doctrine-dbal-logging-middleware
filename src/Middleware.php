@@ -6,7 +6,6 @@ namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * @api
