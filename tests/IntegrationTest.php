@@ -63,6 +63,9 @@ class IntegrationTest extends TestCase
         $conn->close();
     }
 
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
     #[DataProvider('loggers')]
     public function testBindValueByPosition(string $loggerClass): void
     {
@@ -80,6 +83,9 @@ class IntegrationTest extends TestCase
         self::assertCount(1, $results->fetchAllAssociative());
     }
 
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
     #[DataProvider('loggers')]
     public function testBindValueByName(string $loggerClass): void
     {
@@ -97,6 +103,9 @@ class IntegrationTest extends TestCase
         self::assertCount(1, $results->fetchAllAssociative());
     }
 
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
     #[DataProvider('loggers')]
     public function testExecAndQuery(string $loggerClass): void
     {
@@ -111,6 +120,9 @@ class IntegrationTest extends TestCase
         self::assertCount(3, $rows);
     }
 
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
     #[DataProvider('loggers')]
     public function testCommit(string $loggerClass): void
     {
@@ -137,6 +149,9 @@ class IntegrationTest extends TestCase
         $conn->commit();
     }
 
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
     #[DataProvider('loggers')]
     public function testRollback(string $loggerClass): void
     {
