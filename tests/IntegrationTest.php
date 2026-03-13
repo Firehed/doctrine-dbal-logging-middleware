@@ -244,6 +244,85 @@ class IntegrationTest extends TestCase
     }
 
     /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnBeginTransactionFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        // Get native connection and start transaction directly to bypass Doctrine's tracking
+        $pdo = $conn->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->beginTransaction();
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('START TRANSACTION');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->beginTransaction();
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnCommitFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        // Start transaction through DBAL, then roll it back via PDO
+        // so DBAL's commit will fail
+        $conn->beginTransaction();
+        $pdo = $conn->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->rollBack();
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('COMMIT');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->commit();
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnRollbackFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        // Start transaction through DBAL, then commit it via PDO
+        // so DBAL's rollback will fail
+        $conn->beginTransaction();
+        $pdo = $conn->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->commit();
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('ROLLBACK');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->rollBack();
+    }
+
+    /**
      * @return array{class-string<QueryLogger>}[]
      */
     public static function loggers(): array
