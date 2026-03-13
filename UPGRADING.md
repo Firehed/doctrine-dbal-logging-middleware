@@ -1,7 +1,40 @@
 # 3.0.0
 
-`QueryLogger` and `DbalLogger` are no longer separate interfaces; there's only `DbalLogger`.
-If you were relying on the more narrowly-scoped `QueryLogger` interface, you'll need to add `connect()` and `disconnect()` methods (which can be empty) and change which interface you're implementing.
+## PHP 8.2 required
+
+PHP 8.1 is no longer supported.
+PHP 8.2 or later is required.
+Note: As of release, PHP 8.2 is _already_ EOL, but this library doesn't require newer features.
+
+## Interface changes
+
+The logger interface has several breaking changes:
+
+### Interface consolidation
+
+`QueryLogger` and `DbalLogger` have been merged into a single `DbalLogger` interface.
+
+If you previously implemented `QueryLogger`, you'll need to:
+1. Change `implements QueryLogger` to `implements DbalLogger`
+2. Add `connect(): void` and `disconnect(): void` methods (can be empty no-ops)
+
+### Native types added
+
+The interface methods now have native type declarations:
+- `startQuery(string $sql, ...)` - `$sql` parameter is now typed
+- `startQuery(...): void` - return type added
+- `stopQuery(...): void` - return type added
+
+### Exception parameter added to `stopQuery()`
+
+`stopQuery()` now accepts a nullable `?Throwable $exception` parameter.
+If a query fails, the exception is passed; on success, `null` is passed.
+Update your implementation signature to accept this parameter (you may ignore it).
+
+## Middleware constructor
+
+The `Middleware` constructor now requires a `DbalLogger` instance.
+Previously it accepted `QueryLogger` and automatically wrapped it; this is no longer supported.
 
 # 2.0.0
 
