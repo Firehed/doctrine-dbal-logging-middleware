@@ -61,7 +61,13 @@ $middleware = new Middleware($logger);
 // Add to your Doctrine\DBAL\Configuration
 $config = new \Doctrine\DBAL\Configuration();
 $config->setMiddlewares([$middleware]);
+
+$connection = \Doctrine\DBAL\DriverManager::getConnection($connectionDetails, $config);
 ```
+
+> [!TIP]
+> Use dependency injection to provide services to your DbalLogger implementation,
+> such as a log writer (e.g. PSR-3) or telemetry system.
 
 ## Error Handling
 
@@ -96,8 +102,9 @@ use Firehed\DbalLogger\ChainLogger;
 use Firehed\DbalLogger\Middleware;
 
 $chain = new ChainLogger([
-    new MyLogger(),
+    new QueryLogger(),
     new MetricsLogger(),
+    new AuditTrailLogger(),
 ]);
 
 $config = new \Doctrine\DBAL\Configuration();
