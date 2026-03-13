@@ -57,7 +57,7 @@ class ChainLoggerTest extends TestCase
         $this->l1->expects(self::once())->method('stopQuery')->with(null);
         $this->l2->expects(self::once())->method('stopQuery')->with(null);
         $this->l3->expects(self::once())->method('stopQuery')->with(null);
-        $this->logger->stopQuery();
+        $this->logger->stopQuery(null);
     }
 
     public function testStopQueryDelegatesException(): void
