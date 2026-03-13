@@ -8,7 +8,7 @@ use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement as DriverStatement;
-use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * @internal
@@ -42,10 +42,14 @@ final class Connection extends AbstractConnectionMiddleware
     public function query(string $sql): Result
     {
         $this->logger->startQuery($sql);
+        $exception = null;
         try {
             return parent::query($sql);
+        } catch (Throwable $e) {
+            $exception = $e;
+            throw $e;
         } finally {
-            $this->logger->stopQuery();
+            $this->logger->stopQuery($exception);
         }
     }
 
