@@ -10,10 +10,6 @@ use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use Throwable;
 
-use function array_slice;
-use function func_get_args;
-use function func_num_args;
-
 /**
  * @internal
  */
