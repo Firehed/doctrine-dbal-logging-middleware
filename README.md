@@ -18,6 +18,33 @@ The bundled Middleware-based replacement is _similar_, but with a few critical d
 
 The basic `QueryLogger` API remains the same: `startQuery()` and `stopQuery()`.
 
+## Error Handling
+
+The `stopQuery()` method accepts an optional `?\Throwable $exception` parameter.
+If the query failed with an exception, it will be passed to `stopQuery()`.
+On success, `null` is passed.
+
+This allows your logger to record query failures for debugging or metrics purposes:
+
+```php
+public function stopQuery(?Throwable $exception = null): void
+{
+    $duration = hrtime(true) - $this->start;
+    if ($exception !== null) {
+        $this->logger->error('Query failed', [
+            'sql' => $this->sql,
+            'duration' => $duration,
+            'exception' => $exception,
+        ]);
+    } else {
+        $this->logger->debug('Query completed', [
+            'sql' => $this->sql,
+            'duration' => $duration,
+        ]);
+    }
+}
+```
+
 ## How this is different from the original
 
 `Doctrine\DBAL\Logging\SQLLogger` is now `Firehed\DbalLogger\QueryLogger` (the API remains the same).
@@ -33,6 +60,8 @@ This is optional, and if you want a low-effort conversion, it's fine to stick wi
 The `SAVEPOINT` queries either will show up in their underlying connection-specific syntax or possibly not at all.
 I'm not sure how to test this!
 (doctrine/dbal/src/Connection.php and thereabouts)
+
+You can now find out about query failres (see Error Handling, above)
 
 ## How to use this
 If you have an implemenation of the DBAL SQLLogger interface (which is probably the case if you're here), you'll need to make the following changes:
