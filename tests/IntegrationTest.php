@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 #[CoversClass(Connection::class)]
 #[CoversClass(Driver::class)]
@@ -34,7 +35,8 @@ class IntegrationTest extends TestCase
             ->method('startQuery')
             ->with('SELECT 1', null, null);
         $logger->expects(self::once())
-            ->method('stopQuery');
+            ->method('stopQuery')
+            ->with(null);
 
         $conn->executeQuery('SELECT 1');
 
@@ -53,7 +55,8 @@ class IntegrationTest extends TestCase
             ->method('startQuery')
             ->with('SELECT 1', null, null);
         $logger->expects(self::once())
-            ->method('stopQuery');
+            ->method('stopQuery')
+            ->with(null);
 
         $conn->executeQuery('SELECT 1');
 
@@ -175,6 +178,147 @@ class IntegrationTest extends TestCase
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'abc');
         self::assertSame(1, $stmt->executeStatement());
+        $conn->rollBack();
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnQueryFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('SELECT * FROM nonexistent_table');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->executeQuery('SELECT * FROM nonexistent_table');
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnExecFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('INSERT INTO nonexistent_table (id) VALUES (1)');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->executeStatement('INSERT INTO nonexistent_table (id) VALUES (1)');
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnPreparedStatementFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+        $this->insertRow($conn, 'a');
+
+        $logger->expects(self::once())
+            ->method('startQuery');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
+        $stmt->bindValue('id', 'a');
+        $stmt->executeStatement();
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnBeginTransactionFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        // Get native connection and start transaction directly to bypass Doctrine's tracking
+        $pdo = $conn->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->beginTransaction();
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('START TRANSACTION');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->beginTransaction();
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnCommitFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        // Start transaction through DBAL, then roll it back via PDO
+        // so DBAL's commit will fail
+        $conn->beginTransaction();
+        $pdo = $conn->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->rollBack();
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('COMMIT');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
+        $conn->commit();
+    }
+
+    /**
+     * @param class-string<QueryLogger> $loggerClass
+     */
+    #[DataProvider('loggers')]
+    public function testStopQueryReceivesExceptionOnRollbackFailure(string $loggerClass): void
+    {
+        $logger = $this->createMock($loggerClass);
+        $conn = $this->createDbal($logger);
+
+        // Start transaction through DBAL, then commit it via PDO
+        // so DBAL's rollback will fail
+        $conn->beginTransaction();
+        $pdo = $conn->getNativeConnection();
+        assert($pdo instanceof PDO);
+        $pdo->commit();
+
+        $logger->expects(self::once())
+            ->method('startQuery')
+            ->with('ROLLBACK');
+        $logger->expects(self::once())
+            ->method('stopQuery')
+            ->with(self::isInstanceOf(Throwable::class));
+
+        $this->expectException(Throwable::class);
         $conn->rollBack();
     }
 

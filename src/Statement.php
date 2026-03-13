@@ -8,7 +8,7 @@ use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
-use Psr\Log\LoggerInterface;
+use Throwable;
 
 use function array_slice;
 use function func_get_args;
@@ -48,10 +48,14 @@ final class Statement extends AbstractStatementMiddleware
     public function execute(): ResultInterface
     {
         $this->logger->startQuery($this->sql, $this->params, $this->types);
+        $exception = null;
         try {
             return parent::execute();
+        } catch (Throwable $e) {
+            $exception = $e;
+            throw $e;
         } finally {
-            $this->logger->stopQuery();
+            $this->logger->stopQuery($exception);
         }
     }
 }
