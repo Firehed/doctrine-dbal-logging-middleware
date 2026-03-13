@@ -70,30 +70,42 @@ final class Connection extends AbstractConnectionMiddleware
     public function beginTransaction(): void
     {
         $this->logger->startQuery('START TRANSACTION');
+        $exception = null;
         try {
             parent::beginTransaction();
+        } catch (Throwable $e) {
+            $exception = $e;
+            throw $e;
         } finally {
-            $this->logger->stopQuery();
+            $this->logger->stopQuery($exception);
         }
     }
 
     public function commit(): void
     {
         $this->logger->startQuery('COMMIT');
+        $exception = null;
         try {
             parent::commit();
+        } catch (Throwable $e) {
+            $exception = $e;
+            throw $e;
         } finally {
-            $this->logger->stopQuery();
+            $this->logger->stopQuery($exception);
         }
     }
 
     public function rollBack(): void
     {
         $this->logger->startQuery('ROLLBACK');
+        $exception = null;
         try {
             parent::rollBack();
+        } catch (Throwable $e) {
+            $exception = $e;
+            throw $e;
         } finally {
-            $this->logger->stopQuery();
+            $this->logger->stopQuery($exception);
         }
     }
 }
