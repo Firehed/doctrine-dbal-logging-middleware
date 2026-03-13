@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\ParameterType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,7 @@ class ChainLoggerTest extends TestCase
         $this->logger = new ChainLogger([$this->l1, $this->l2, $this->l3]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testConnectDelegates(): void
     {
         $this->l1->expects(self::once())->method('connect');
@@ -33,6 +35,7 @@ class ChainLoggerTest extends TestCase
         $this->logger->connect();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDisconnectDelegates(): void
     {
         $this->l1->expects(self::once())->method('disconnect');

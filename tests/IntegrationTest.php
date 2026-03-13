@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use PDO;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -99,7 +100,7 @@ class IntegrationTest extends TestCase
     #[DataProvider('loggers')]
     public function testExecAndQuery(string $loggerClass): void
     {
-        $logger = $this->createMock($loggerClass);
+        $logger = $this->createStub($loggerClass);
         $conn = $this->createDbal($logger);
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('a')");
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('b')");
