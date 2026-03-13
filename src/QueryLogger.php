@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Types\Type;
 use Throwable;
 
 /**
@@ -25,4 +26,8 @@ interface QueryLogger
      * If the query failed with an exception of any kind, it will be provided.
      */
     public function stopQuery(?Throwable $exception = null): void;
+
+    public function connect(): void;
+
+    public function disconnect(): void;
 }
