@@ -5,22 +5,24 @@ declare(strict_types=1);
 namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use PDO;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- *
- * @covers Firehed\DbalLogger\Connection
- * @covers Firehed\DbalLogger\Driver
- * @covers Firehed\DbalLogger\Middleware
- * @covers Firehed\DbalLogger\SqlLoggerBridge
- * @covers Firehed\DbalLogger\Statement
- */
-class IntegrationTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(Connection::class)]
+#[CoversClass(Driver::class)]
+#[CoversClass(Middleware::class)]
+#[CoversClass(SqlLoggerBridge::class)]
+#[CoversClass(Statement::class)]
+#[Group('integration')]
+class IntegrationTest extends TestCase
 {
     public function testConstructWithQueryLogger(): void
     {
@@ -62,11 +64,12 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
+     * @param class-string<QueryLogger> $loggerClass
      */
-    public function testBindValueByPosition(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testBindValueByPosition(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $conn = $this->createDbal($logger);
         $this->insertRow($conn, 'a');
 
@@ -81,11 +84,12 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
+     * @param class-string<QueryLogger> $loggerClass
      */
-    public function testBindValueByName(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testBindValueByName(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $conn = $this->createDbal($logger);
         $this->insertRow($conn, 'a');
 
@@ -100,11 +104,12 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
+     * @param class-string<QueryLogger> $loggerClass
      */
-    public function testExecAndQuery(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testExecAndQuery(string $loggerClass): void
     {
+        $logger = self::createStub($loggerClass);
         $conn = $this->createDbal($logger);
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('a')");
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('b')");
@@ -115,19 +120,27 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         self::assertCount(3, $rows);
     }
 
-     /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
+    /**
+     * @param class-string<QueryLogger> $loggerClass
      */
-    public function testCommit(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testCommit(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
+        $callIndex = 0;
+        $expectedCalls = [
+            ['START TRANSACTION', null, null],
+            ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
+            ['COMMIT', null, null],
+        ];
         $logger->expects(self::exactly(3))
             ->method('startQuery')
-            ->withConsecutive(
-                ['START TRANSACTION', null, null],
-                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
-                ['COMMIT', null, null],
-            );
+            ->willReturnCallback(function ($sql, $params, $types) use (&$callIndex, $expectedCalls) {
+                self::assertSame($expectedCalls[$callIndex][0], $sql);
+                self::assertSame($expectedCalls[$callIndex][1], $params);
+                self::assertSame($expectedCalls[$callIndex][2], $types);
+                $callIndex++;
+            });
         $conn = $this->createDbal($logger);
         $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
@@ -137,18 +150,26 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
+     * @param class-string<QueryLogger> $loggerClass
      */
-    public function testRollback(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testRollback(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
+        $callIndex = 0;
+        $expectedCalls = [
+            ['START TRANSACTION', null, null],
+            ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
+            ['ROLLBACK', null, null],
+        ];
         $logger->expects(self::exactly(3))
             ->method('startQuery')
-            ->withConsecutive(
-                ['START TRANSACTION', null, null],
-                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
-                ['ROLLBACK', null, null],
-            );
+            ->willReturnCallback(function ($sql, $params, $types) use (&$callIndex, $expectedCalls) {
+                self::assertSame($expectedCalls[$callIndex][0], $sql);
+                self::assertSame($expectedCalls[$callIndex][1], $params);
+                self::assertSame($expectedCalls[$callIndex][2], $types);
+                $callIndex++;
+            });
         $conn = $this->createDbal($logger);
         $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
@@ -158,17 +179,17 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array{MockObject}[]
+     * @return array{class-string<QueryLogger>}[]
      */
-    public function loggers(): array
+    public static function loggers(): array
     {
         return [
-            'QueryLogger' => [self::createMock(QueryLogger::class)],
-            'DbalLogger' => [self::createMock(DbalLogger::class)],
+            'QueryLogger' => [QueryLogger::class],
+            'DbalLogger' => [DbalLogger::class],
         ];
     }
 
-    private function createDbal(QueryLogger $logger): Connection
+    private function createDbal(QueryLogger $logger): DBALConnection
     {
         $connectionParams = [
             'url' => 'sqlite:///:memory:',
@@ -185,7 +206,7 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         return $conn;
     }
 
-    private function insertRow(Connection $conn, string $id): void
+    private function insertRow(DBALConnection $conn, string $id): void
     {
         $conn->executeStatement("INSERT INTO users (id) VALUES (:id)", ['id' => $id]);
     }
