@@ -20,29 +20,10 @@ use Throwable;
 #[CoversClass(Connection::class)]
 #[CoversClass(Driver::class)]
 #[CoversClass(Middleware::class)]
-#[CoversClass(SqlLoggerBridge::class)]
 #[CoversClass(Statement::class)]
 #[Group('integration')]
 class IntegrationTest extends TestCase
 {
-    public function testConstructWithQueryLogger(): void
-    {
-        $logger = self::createMock(QueryLogger::class);
-
-        $conn = $this->createDbal($logger);
-
-        $logger->expects(self::once())
-            ->method('startQuery')
-            ->with('SELECT 1', null, null);
-        $logger->expects(self::once())
-            ->method('stopQuery')
-            ->with(null);
-
-        $conn->executeQuery('SELECT 1');
-
-        $conn->close();
-    }
-
     public function testConstructWithDbalLogger(): void
     {
         $logger = self::createMock(DbalLogger::class);
