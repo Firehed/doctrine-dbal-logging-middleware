@@ -9,18 +9,19 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use PDO;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- *
- * @covers Firehed\DbalLogger\Connection
- * @covers Firehed\DbalLogger\Driver
- * @covers Firehed\DbalLogger\Middleware
- * @covers Firehed\DbalLogger\SqlLoggerBridge
- * @covers Firehed\DbalLogger\Statement
- */
-class IntegrationTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(Connection::class)]
+#[CoversClass(Driver::class)]
+#[CoversClass(Middleware::class)]
+#[CoversClass(SqlLoggerBridge::class)]
+#[CoversClass(Statement::class)]
+#[Group('integration')]
+class IntegrationTest extends TestCase
 {
     public function testConstructWithQueryLogger(): void
     {
@@ -61,11 +62,8 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $conn->close();
     }
 
-    /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
-     */
-    public function testBindValueByPosition(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testBindValueByPosition(QueryLogger&MockObject $logger): void
     {
         $conn = $this->createDbal($logger);
         $this->insertRow($conn, 'a');
@@ -80,11 +78,8 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         self::assertCount(1, $results->fetchAllAssociative());
     }
 
-    /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
-     */
-    public function testBindValueByName(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testBindValueByName(QueryLogger&MockObject $logger): void
     {
         $conn = $this->createDbal($logger);
         $this->insertRow($conn, 'a');
@@ -99,11 +94,8 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         self::assertCount(1, $results->fetchAllAssociative());
     }
 
-    /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
-     */
-    public function testExecAndQuery(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testExecAndQuery(QueryLogger&MockObject $logger): void
     {
         $conn = $this->createDbal($logger);
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('a')");
@@ -115,11 +107,8 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         self::assertCount(3, $rows);
     }
 
-     /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
-     */
-    public function testCommit(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testCommit(QueryLogger&MockObject $logger): void
     {
         $logger->expects(self::exactly(3))
             ->method('startQuery')
@@ -136,11 +125,8 @@ class IntegrationTest extends \PHPUnit\Framework\TestCase
         $conn->commit();
     }
 
-    /**
-     * @dataProvider loggers
-     * @param MockObject&QueryLogger $logger
-     */
-    public function testRollback(QueryLogger $logger): void
+    #[DataProvider('loggers')]
+    public function testRollback(QueryLogger&MockObject $logger): void
     {
         $logger->expects(self::exactly(3))
             ->method('startQuery')

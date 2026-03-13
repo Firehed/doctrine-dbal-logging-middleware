@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Firehed\DbalLogger;
 
 use Doctrine\DBAL\ParameterType;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Firehed\DbalLogger\ChainLogger
- */
+#[CoversClass(ChainLogger::class)]
 class ChainLoggerTest extends TestCase
 {
     private DbalLogger&MockObject $l1;
