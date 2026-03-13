@@ -114,13 +114,20 @@ class IntegrationTest extends TestCase
     public function testCommit(string $loggerClass): void
     {
         $logger = $this->createMock($loggerClass);
+        $callIndex = 0;
+        $expectedCalls = [
+            ['START TRANSACTION', null, null],
+            ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
+            ['COMMIT', null, null],
+        ];
         $logger->expects(self::exactly(3))
             ->method('startQuery')
-            ->withConsecutive(
-                ['START TRANSACTION', null, null],
-                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
-                ['COMMIT', null, null],
-            );
+            ->willReturnCallback(function ($sql, $params, $types) use (&$callIndex, $expectedCalls) {
+                self::assertSame($expectedCalls[$callIndex][0], $sql);
+                self::assertSame($expectedCalls[$callIndex][1], $params);
+                self::assertSame($expectedCalls[$callIndex][2], $types);
+                $callIndex++;
+            });
         $conn = $this->createDbal($logger);
         $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
@@ -133,13 +140,20 @@ class IntegrationTest extends TestCase
     public function testRollback(string $loggerClass): void
     {
         $logger = $this->createMock($loggerClass);
+        $callIndex = 0;
+        $expectedCalls = [
+            ['START TRANSACTION', null, null],
+            ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
+            ['ROLLBACK', null, null],
+        ];
         $logger->expects(self::exactly(3))
             ->method('startQuery')
-            ->withConsecutive(
-                ['START TRANSACTION', null, null],
-                ['INSERT INTO users (id) VALUES (:id)', ['id' => 'abc'], ['id' => ParameterType::STRING]],
-                ['ROLLBACK', null, null],
-            );
+            ->willReturnCallback(function ($sql, $params, $types) use (&$callIndex, $expectedCalls) {
+                self::assertSame($expectedCalls[$callIndex][0], $sql);
+                self::assertSame($expectedCalls[$callIndex][1], $params);
+                self::assertSame($expectedCalls[$callIndex][2], $types);
+                $callIndex++;
+            });
         $conn = $this->createDbal($logger);
         $conn->beginTransaction();
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
