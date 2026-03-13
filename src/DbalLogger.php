@@ -16,7 +16,7 @@ interface DbalLogger
      * Logs a SQL statement somewhere.
      *
      * @param array<int|string, mixed>|null $params Statement parameters
-     * @param ParameterType[] $types
+     * @param array<int|string, ParameterType>|null $types
      */
     public function startQuery(string $sql, ?array $params = null, ?array $types = null): void;
 
