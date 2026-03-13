@@ -12,7 +12,7 @@ use Throwable;
 class ChainLogger implements DbalLogger
 {
     /**
-     * @param QueryLogger[] $loggers
+     * @param DbalLogger[] $loggers
      */
     public function __construct(private array $loggers)
     {
@@ -21,18 +21,14 @@ class ChainLogger implements DbalLogger
     public function connect(): void
     {
         foreach ($this->loggers as $logger) {
-            if ($logger instanceof DbalLogger) {
-                $logger->connect();
-            }
+            $logger->connect();
         }
     }
 
     public function disconnect(): void
     {
         foreach ($this->loggers as $logger) {
-            if ($logger instanceof DbalLogger) {
-                $logger->disconnect();
-            }
+            $logger->disconnect();
         }
     }
 
