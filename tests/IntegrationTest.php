@@ -35,7 +35,8 @@ class IntegrationTest extends TestCase
             ->method('startQuery')
             ->with('SELECT 1', null, null);
         $logger->expects(self::once())
-            ->method('stopQuery');
+            ->method('stopQuery')
+            ->with(null);
 
         $conn->executeQuery('SELECT 1');
 
@@ -54,7 +55,8 @@ class IntegrationTest extends TestCase
             ->method('startQuery')
             ->with('SELECT 1', null, null);
         $logger->expects(self::once())
-            ->method('stopQuery');
+            ->method('stopQuery')
+            ->with(null);
 
         $conn->executeQuery('SELECT 1');
 
@@ -239,25 +241,6 @@ class IntegrationTest extends TestCase
         $stmt = $conn->prepare('INSERT INTO users (id) VALUES (:id)');
         $stmt->bindValue('id', 'a');
         $stmt->executeStatement();
-    }
-
-    /**
-     * @param class-string<QueryLogger> $loggerClass
-     */
-    #[DataProvider('loggers')]
-    public function testStopQueryReceivesNullOnSuccess(string $loggerClass): void
-    {
-        $logger = $this->createMock($loggerClass);
-        $conn = $this->createDbal($logger);
-
-        $logger->expects(self::once())
-            ->method('startQuery')
-            ->with('SELECT 1', null, null);
-        $logger->expects(self::once())
-            ->method('stopQuery')
-            ->with(null);
-
-        $conn->executeQuery('SELECT 1');
     }
 
     /**
