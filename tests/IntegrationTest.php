@@ -63,8 +63,9 @@ class IntegrationTest extends TestCase
     }
 
     #[DataProvider('loggers')]
-    public function testBindValueByPosition(QueryLogger&MockObject $logger): void
+    public function testBindValueByPosition(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $conn = $this->createDbal($logger);
         $this->insertRow($conn, 'a');
 
@@ -79,8 +80,9 @@ class IntegrationTest extends TestCase
     }
 
     #[DataProvider('loggers')]
-    public function testBindValueByName(QueryLogger&MockObject $logger): void
+    public function testBindValueByName(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $conn = $this->createDbal($logger);
         $this->insertRow($conn, 'a');
 
@@ -95,8 +97,9 @@ class IntegrationTest extends TestCase
     }
 
     #[DataProvider('loggers')]
-    public function testExecAndQuery(QueryLogger&MockObject $logger): void
+    public function testExecAndQuery(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $conn = $this->createDbal($logger);
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('a')");
         $rowCount = $conn->executeStatement("INSERT INTO users (id) VALUES ('b')");
@@ -108,8 +111,9 @@ class IntegrationTest extends TestCase
     }
 
     #[DataProvider('loggers')]
-    public function testCommit(QueryLogger&MockObject $logger): void
+    public function testCommit(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $logger->expects(self::exactly(3))
             ->method('startQuery')
             ->withConsecutive(
@@ -126,8 +130,9 @@ class IntegrationTest extends TestCase
     }
 
     #[DataProvider('loggers')]
-    public function testRollback(QueryLogger&MockObject $logger): void
+    public function testRollback(string $loggerClass): void
     {
+        $logger = $this->createMock($loggerClass);
         $logger->expects(self::exactly(3))
             ->method('startQuery')
             ->withConsecutive(
@@ -144,13 +149,13 @@ class IntegrationTest extends TestCase
     }
 
     /**
-     * @return array{MockObject}[]
+     * @return array{class-string<QueryLogger>}[]
      */
-    public function loggers(): array
+    public static function loggers(): array
     {
         return [
-            'QueryLogger' => [self::createMock(QueryLogger::class)],
-            'DbalLogger' => [self::createMock(DbalLogger::class)],
+            'QueryLogger' => [QueryLogger::class],
+            'DbalLogger' => [DbalLogger::class],
         ];
     }
 
